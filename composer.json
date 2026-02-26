@@ -1,0 +1,18 @@
+{
+    "name": "blaine/personal-budget-tracker-cli",
+    "description": "A command-line PHP application that lets you track income and expenses, storing everything in a JSON file",
+    "type": "project",
+    "autoload": {
+        "psr-4": {
+            "Blaine\\PersonalBudgetTrackerCli\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "blaine george",
+            "email": "blainegeorge98@gmail.com"
+        }
+    ],
+    "minimum-stability": "dev",
+    "require": {}
+}
