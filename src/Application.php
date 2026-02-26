@@ -20,25 +20,34 @@ class Application
 
             $input = readline("Choose an option: ");
 
-            if ($input == 0) {
+            if (!$this->validateInput($input))
+            {
+                echo "Invalid choice, please choose another option";
+                continue;
+            }
+
+            if ($input === '0') {
                 return 0;
             }
 
-            echo "You chose option $input \n";
+            echo "You chose option $input \n\n";
         }
     }
 
     private function renderMenu(): string
     {
         $menu_title = "=== Budget Tracker ===";
-
         $menu_options = "";
 
         foreach ($this->options as $index => $option) {
-
-            $menu_options .= "$index . $option \n";
+            $menu_options .= "$index. $option \n";
         }
 
         return $menu_title . "\n\n" . $menu_options;
+    }
+
+    private function validateInput(string $input): bool
+    {
+        return array_key_exists($input, $this->options);
     }
 }
