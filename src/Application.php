@@ -36,14 +36,14 @@ class Application
 
     private function renderMenu(): string
     {
-        $menu_title = "=== Budget Tracker ===";
-        $menu_options = "";
+        $menuTitle = "=== Budget Tracker ===";
+        $menuOptions = "";
 
         foreach ($this->options as $index => $option) {
-            $menu_options .= "$index. $option \n";
+            $menuOptions .= "$index. $option \n";
         }
 
-        return $menu_title . "\n\n" . $menu_options;
+        return $menuTitle . "\n\n" . $menuOptions;
     }
 
     private function validateInput(string $input): bool
