@@ -18,11 +18,10 @@ class Application
         while (true) {
             echo $this->renderMenu();
 
-            $input = readline("Choose an option: ");
+            $input = readline("\nChoose an option: ");
 
-            if (!$this->validateInput($input))
-            {
-                echo "Invalid choice, please choose another option";
+            if (!$this->validateInput($input)) {
+                echo "Invalid choice, please choose another option\n";
                 continue;
             }
 
@@ -30,20 +29,20 @@ class Application
                 return 0;
             }
 
-            echo "You chose option $input \n\n";
+            echo "You chose option $input \n";
         }
     }
 
     private function renderMenu(): string
     {
-        $menuTitle = "=== Budget Tracker ===";
+        $menuTitle = "\n=== Budget Tracker ===\n";
         $menuOptions = "";
 
         foreach ($this->options as $index => $option) {
             $menuOptions .= "$index. $option \n";
         }
 
-        return $menuTitle . "\n\n" . $menuOptions;
+        return $menuTitle . $menuOptions . "\n";
     }
 
     private function validateInput(string $input): bool
