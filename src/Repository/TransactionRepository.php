@@ -2,51 +2,85 @@
 
 namespace Blaine\PersonalBudgetTrackerCli\Repository;
 
+use Blaine\PersonalBudgetTrackerCli\Exceptions\StorageException;
+use InvalidArgumentException;
 use JsonException;
 
 class TransactionRepository
 {
     private string $filePath;
 
-    function __construct(string $filePath)
+    public function __construct(string $filePath)
     {
+        if (trim($filePath) === '') {
+            throw new InvalidArgumentException('The supplied path was empty');
+        }
+
+        if (!is_dir(dirname($filePath))) {
+            throw new InvalidArgumentException('The directory ' . dirname($filePath) . ' does not exist');
+        }
+
         $this->filePath = $filePath;
-
-        if (!file_exists($this->filePath)) {
-            file_put_contents($this->filePath, json_encode([]));
-        }
-    }
-
-    public function loadTransactions(): array
-    {
-        $file = file_get_contents($this->filePath);
-
-        if ($file === '' || $file === false) {
-            return [];
-        }
-
-        $decodedFile = json_decode($file, true);
-
-        if (!is_array($decodedFile)) {
-            return [];
-        }
-
-        return $decodedFile;
     }
 
     /**
      * @throws JsonException
+     * @throws StorageException
+     */
+    public function loadTransactions(): array
+    {
+        if (!file_exists($this->filePath)) {
+            return [];
+        }
+
+        $file = file_get_contents(
+            filename: $this->filePath
+        );
+
+        if ($file === false) {
+            throw new StorageException('Failed to access file data.');
+        }
+
+        if ($file === '') {
+            return [];
+        }
+
+        $load =  json_decode(
+            json: $file,
+            associative: true,
+            flags: JSON_THROW_ON_ERROR,
+        );
+
+        if (!is_array($load) || !array_is_list($load)) {
+            throw new StorageException('Data is unexpected or corrupted.');
+        }
+
+        return $load;
+    }
+
+    /**
+     * @throws JsonException
+     * @throws StorageException
      */
     public function saveTransactions(array $transactions): void
     {
-        $encodedTransactions = json_encode($transactions, JSON_PRETTY_PRINT | JSON_THROW_ON_ERROR);
-        $temporaryPath = $this->filePath . '.tmp';
-        $temporaryFile = file_put_contents($temporaryPath, $encodedTransactions);
+        $temporaryFile = file_put_contents(
+            filename: $this->filePath . '.tmp',
+            data: json_encode($transactions, JSON_PRETTY_PRINT | JSON_THROW_ON_ERROR)
+        );
 
         if ($temporaryFile === false) {
-            // Throw an exception
+            throw new StorageException('Failed to create file.');
         }
 
-        rename($temporaryPath, $this->filePath);
+        $save = rename(
+            from: $this->filePath . '.tmp',
+            to: $this->filePath
+        );
+
+        if ($save === false) {
+            unlink($this->filePath . '.tmp');
+            throw new StorageException('Failed to write file to disk.');
+        }
     }
 }

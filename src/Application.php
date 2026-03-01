@@ -2,6 +2,10 @@
 
 namespace Blaine\PersonalBudgetTrackerCli;
 
+use Blaine\PersonalBudgetTrackerCli\Exceptions\StorageException;
+use Blaine\PersonalBudgetTrackerCli\Repository\TransactionRepository;
+use JsonException;
+
 class Application
 {
     private array $options = [
@@ -13,6 +17,9 @@ class Application
         '0' => 'Exit'
     ];
 
+    /**
+     * @throws JsonException
+     */
     public function run(): int
     {
         while (true) {
@@ -27,6 +34,28 @@ class Application
 
             if ($input === '0') {
                 return 0;
+            }
+
+            $repository = new TransactionRepository('storage/test.json');
+
+            if ($input == 1) {
+                try {
+                    $repository->saveTransactions([
+                        ['date' => '01/03/2026', 'transaction' => 150],
+                        ['date' => '01/02/2026', 'transaction' => 150],
+                        ['date' => '01/01/2026', 'transaction' => 150],
+                    ]);
+                } catch (StorageException $e) {
+                    echo $e->getMessage();
+                }
+            }
+
+            if ($input == 2) {
+                try {
+                     print_r($repository->loadTransactions());
+                } catch (StorageException $e) {
+                    echo $e->getMessage();
+                }
             }
 
             echo "You chose option $input \n";
